@@ -1,0 +1,208 @@
+🔹 Recipe 12: AWS Setup
+📄 main.tf
+provider "aws" {
+  region = "ap-south-1"
+}
+⚙ Commands
+terraform init
+terraform validate
+🎯 Output
+Terraform initialized
+AWS connection configured
+🔹 Recipe 13: S3 Bucket
+📄 main.tf
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_s3_bucket" "bucket" {
+  bucket = "my-unique-bucket-12345"
+}
+⚙ Commands
+terraform init
+terraform plan
+terraform apply
+terraform destroy
+🎯 Output
+S3 bucket created and destroyed
+
+🔹 Recipe 14: Remote State
+📄 main.tf
+terraform {
+  backend "s3" {
+    bucket = "my-terraform-state-bucket"
+    key    = "terraform.tfstate"
+    region = "ap-south-1"
+  }
+}
+
+provider "aws" {
+  region = "ap-south-1"
+}
+⚙ Commands
+terraform init
+terraform plan
+🎯 Output
+State stored in S3
+
+🔹 Recipe 15: EC2 Instance
+📄 main.tf
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "ec2" {
+  ami           = "ami-0f5ee92e2d63afc18"
+  instance_type = "t2.micro"
+}
+⚙ Commands
+terraform init
+terraform apply
+terraform destroy
+🎯 Output
+EC2 instance launched
+
+🔹 Recipe 16: Web Server
+📄 main.tf
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_security_group" "web_sg" {
+  name = "web-sg"
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_instance" "web" {
+  ami           = "ami-0f5ee92e2d63afc18"
+  instance_type = "t2.micro"
+
+  security_groups = [aws_security_group.web_sg.name]
+
+  user_data = <<EOF
+#!/bin/bash
+yum install httpd -y
+systemctl start httpd
+echo "Hello Terraform" > /var/www/html/index.html
+EOF
+}
+⚙ Commands
+terraform init
+terraform apply
+🎯 Output
+Web server accessible via public IP
+
+🔹 Recipe 17: RDS Database
+📄 main.tf
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_db_instance" "db" {
+  allocated_storage   = 20
+  engine              = "mysql"
+  instance_class      = "db.t2.micro"
+  username            = "admin"
+  password            = "password123"
+  skip_final_snapshot = true
+}
+⚙ Commands
+terraform init
+terraform apply
+🎯 Output
+RDS instance created
+
+🔹 Recipe 18: Web App (EC2 + RDS)
+📄 main.tf
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "web" {
+  ami           = "ami-0f5ee92e2d63afc18"
+  instance_type = "t2.micro"
+}
+
+resource "aws_db_instance" "db" {
+  allocated_storage   = 20
+  engine              = "mysql"
+  instance_class      = "db.t2.micro"
+  username            = "admin"
+  password            = "password123"
+  skip_final_snapshot = true
+}
+⚙ Commands
+terraform init
+terraform apply
+🎯 Output
+Web app infrastructure created
+
+🔹 Recipe 19: Modify Infrastructure
+📄 main.tf (change example)
+instance_type = "t2.small"
+⚙ Commands
+terraform plan
+terraform apply
+🎯 Output
+Infrastructure updated
+
+🔹 Recipe 20: Load Balancer
+📄 main.tf
+resource "aws_lb" "alb" {
+  name               = "my-alb"
+  load_balancer_type = "application"
+  subnets            = ["subnet-xxxx"]
+}
+⚙ Commands
+terraform init
+terraform apply
+🎯 Output
+Load balancer distributes traffic
+
+🔹 Recipe 21: Dependencies
+📄 main.tf
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+}
+
+resource "aws_subnet" "sub" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.1.0/24"
+}
+⚙ Commands
+terraform plan
+terraform apply
+🎯 Output
+Resources created in correct order
+
+🔹 Recipe 22: Zero Downtime
+📄 main.tf
+resource "aws_instance" "web" {
+  ami           = "ami-xxxx"
+  instance_type = "t2.micro"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+🎯 Output
+No downtime during updates
+
+🔹 Recipe 23: Auto Scaling
+📄 main.tf
+resource "aws_autoscaling_group" "asg" {
+  min_size         = 1
+  max_size         = 3
+  desired_capacity = 2
+}
+⚙ Commands
+terraform init
+terraform apply
+🎯 Output
+Auto scaling works based on load
